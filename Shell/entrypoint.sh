@@ -16,7 +16,7 @@ do
         SSL="-d ${i} ${SSL}"
         echo "<a href=\"$i\">$i</a><br>" >> /home/all/index.html
 done
-DOMAIN_FOLDER=`find /home/ssl -name 'fullchain.cer'|sed 's|/fullchain.cer||g'|sed 's|/home/ssl/||g'
+DOMAIN_FOLDER=`find /home/ssl -name 'fullchain.cer'|sed 's|/fullchain.cer||g'|sed 's|/home/ssl/||g'`
 echo $DOMAIN_FOLDER
 if  [ -e "/home/ssl/${DOMAIN_FOLDER}/fullchain.cer" ]
 then
