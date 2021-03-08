@@ -8,18 +8,16 @@
     addgroup ${username} sudo;
     usermod --shell /bin/bash ${username}
     echo -ne "${ADMIN_PASSWORD}\n${ADMIN_PASSWORD}\n" | smbpasswd -a "${ADMIN_USERNAME}"
-} &> /tmp/config_user
+} &> /log/config_user
 
 mkdir -p /home/all
 for i in ${DOMAIN}
 do
         SSL="-d ${i} ${SSL}"
         echo "<a href=\"$i\">$i</a><br>" >> /home/all/index.html
-        if [[ -z "$DOMAIN_FOLDER" ]]; then
-           DOMAIN_FOLDER=$i
-        fi
 done
-echo $SSL
+DOMAIN_FOLDER=`find /home/ssl -name 'fullchain.cer'|sed 's|/fullchain.cer||g'|sed 's|/home/ssl/||g'
+echo $DOMAIN_FOLDER
 if  [ -e "/home/ssl/${DOMAIN_FOLDER}/fullchain.cer" ]
 then
         echo "We already have an SSL certificate: /home/ssl/${DOMAIN_FOLDER}/fullchain.cer"
