@@ -88,6 +88,8 @@
                 "accessTier": "Hot",
                 "allowBlobPublicAccess": true,
                 "allowSharedKeyAccess": true,
+                "supportsHttpsTrafficOnly": false,
+                "minimumTlsVersion": "TLS1_1",
                 "largeFileSharesState": "Enabled"
             }
         },
