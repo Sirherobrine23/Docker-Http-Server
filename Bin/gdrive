@@ -1,0 +1,7 @@
+#!/bin/bash
+chmod  a+x /bin/gdrive_*
+case $(uname -m) in
+    "x86_64") gdrive_amd64 $@ ;;
+    *) gdrive_arm64 $@ ;;
+esac
+exit 0

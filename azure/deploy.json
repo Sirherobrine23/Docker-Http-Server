@@ -51,7 +51,7 @@
     "variables": {
         "files": "files",
         "ssl": "ssl",
-        "log": "log",
+        "Config": "Configs",
         "StorageName": "[concat('files', uniqueString(resourceGroup().id))]",
         "DnsName": "[concat('files-', uniqueString(resourceGroup().id))]",
         "bds_ports": [
@@ -104,7 +104,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
             "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageName'), '/default/', variables('log'))]",
+            "name": "[concat(variables('StorageName'), '/default/', variables('Config'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
             ],
@@ -128,7 +128,7 @@
             "name": "[parameters('containerName')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('files') )]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('log') )]",
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('Config') )]",
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('ssl') )]"
             ],
             "type": "Microsoft.ContainerInstance/containerGroups",
@@ -174,8 +174,8 @@
                                 "mountPath": "/home/http/"
                                 },
                                 {
-                                "name": "log",
-                                "mountPath": "/log"
+                                "name": "con",
+                                "mountPath": "/home/config"
                                 },
                                 {
                                 "name": "ssl",
@@ -212,9 +212,9 @@
                         }
                     },
                     { 
-                        "name": "log",
+                        "name": "con",
                         "azureFile": {
-                            "shareName": "[variables('log')]",
+                            "shareName": "[variables('Config')]",
                             "StorageAccountName": "[variables('StorageName')]",
                             // https://stackoverflow.com/a/33227123
                             "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"
