@@ -9,19 +9,34 @@
     usermod --shell /bin/bash ${username}
     echo -ne "${ADMIN_PASSWORD}\n${ADMIN_PASSWORD}\n" | smbpasswd -a "${ADMIN_USERNAME}"
 } &> /log/config_user
-
+echo "
+        error_page 404 /404_index.html;
+        location = /404_index.html {
+                root /nginx/404;
+                internal;
+        }
+        error_page 500 502 503 504 /5xx_index.html;
+        location = /5xx_index.html {
+                root /nginx/505;
+                internal;
+        }
+" > /tmp/error_nginx
 mkdir -p /home/all
+echo "<h1>All pages HOME</h1><p>" > /home/all/index.html
 for i in ${DOMAIN}
 do
         SSL="-d ${i} ${SSL}"
-        echo "<a href=\"$i\">$i</a><br>" >> /home/all/index.html
+        echo "<p><a href=\"http://$i\">$i</a></p>" >> /home/all/index.html
 done
+echo "</p>" >> /home/all/index.html
 DOMAIN_FOLDER=`find /home/ssl -name 'fullchain.cer'|sed 's|/fullchain.cer||g'|sed 's|/home/ssl/||g'`
 echo $DOMAIN_FOLDER
+
 if  [ -e "/home/ssl/${DOMAIN_FOLDER}/fullchain.cer" ]
 then
         echo "We already have an SSL certificate: /home/ssl/${DOMAIN_FOLDER}/fullchain.cer"
-        echo "server {
+        DOMAIN_IP=false
+echo "server {
         listen [::]:443 ssl ipv6only=on;
         listen 443 ssl;
         ssl_certificate /home/ssl/${DOMAIN_FOLDER}/fullchain.cer;
@@ -32,14 +47,48 @@ then
         location / {
                 autoindex on;
         }
+$(cat /tmp/error_nginx)
 }
 " > /tmp/ssl_nginx
 else
-        mkdir /home/ssl
-        chmod 7777 -R /home/ssl
-        acme.sh --config-home /home/ssl --dns dns_cf --issue ${SSL}
-        exit 24
+        if [ "${CF_Email}" == "example@hotmail.com" ];then
+                echo "We will not create a certificate because you did not change the email"
+                DOMAIN="_"
+                DOMAIN_IP=true
+        elif [ "${CF_Key}" == "b83188XXXXXXXxxxxxxXcc17XX85085408b3aXX" ];then
+                echo "Please enter a valid Cloudflare Key"
+                DOMAIN="_"
+                DOMAIN_IP=true
+        elif echo "${DOMAIN}"|grep -q "file.examples.com";then
+                echo "Please enter a different domain, do not use the example domains"
+                DOMAIN="_"
+                DOMAIN_IP=true
+        elif echo "${DOMAIN}"|grep -q "f.example.com";then
+                echo "Please enter a different domain, do not use the example domains"
+                DOMAIN="_"
+                DOMAIN_IP=true
+        else
+                if ! [ -d /home/ssl ];then
+                        mkdir /home/ssl
+                        chmod 7777 -R /home/ssl
+                fi
+                acme.sh --config-home /home/ssl --dns dns_cf --issue ${SSL}
+                chmod 7777 -R /home/ssl
+                exit 24
+        fi
 fi
+if [ $DOMAIN_IP == "true" ];then
+echo "server {
+        listen 80;
+        root /home/all;
+        index index.html index.htm;
+        server_name _;
+        location / {
+                autoindex on;
+        }
+$(cat /tmp/error_nginx)
+}" > /tmp/http_nginx
+else
 echo "server {
         listen 80;
         root /home/http;
@@ -48,17 +97,10 @@ echo "server {
         location / {
                 autoindex on;
         }
-}
-server {
-        listen 80;
-        root /home/all;
-        index index.html index.htm;
-        server_name _;
-        location / {
-                autoindex on;
-        }
+$(cat /tmp/error_nginx)
 }
 " > /tmp/http_nginx
+fi
 cat /tmp/http_nginx /tmp/ssl_nginx | tee /etc/nginx/sites-available/default
 service ssh start
 service smbd start
