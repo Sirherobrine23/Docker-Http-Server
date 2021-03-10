@@ -1,10 +1,5 @@
 #!/bin/bash
 #
 cd "/home/http/"
-while true
-do
-#-------------------------------------------------------------------------------------------------
-    NODE_REQUEST_DRIVE="localhost" node -p 'require("/node_script/express")'
-#-------------------------------------------------------------------------------------------------
-done
+NODE_REQUEST_DRIVE="localhost" node -p 'require("/node_script/Google_Drive")'
 exit 0

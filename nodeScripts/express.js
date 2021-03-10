@@ -35,7 +35,7 @@ app.get("/request", (req, res) => {
             //callback(oAuth2Client);
             close_server()
         })
-        var pages_template = (fs.readFileSync("./index.html", "utf8")).toString()
+        var pages_template = (fs.readFileSync("/node_script/index.html", "utf8")).toString()
         pages_template = pages_template.split("@TOKEN").join(code).split("@NODE_DOMAIN").join(process.env.NODE_REQUEST_DRIVE)
         res.send(pages_template)
     })

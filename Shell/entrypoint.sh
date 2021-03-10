@@ -1,19 +1,6 @@
 #!/bin/bash
 # Usernames
-username="${ADMIN_USERNAME}"
-password="${ADMIN_PASSWORD}"
-pass=$(perl -e 'print crypt($ARGV[0], "password")' $password);
-useradd -m -p "$pass" "$username";
-addgroup ${username} sudo;
-usermod --shell /bin/bash ${username}
-echo -ne "${ADMIN_PASSWORD}\n${ADMIN_PASSWORD}\n" | smbpasswd -a "${ADMIN_USERNAME}"
-echo "# Admin User" >> /etc/sudoers
-echo "${ADMIN_USERNAME}   ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
-echo "
-**********************************
-*   Username:  ${ADMIN_USERNAME}
-*   Passworld: ${ADMIN_PASSWORD}
-**********************************"
+export NODE_REQUEST_DRIVE="localhost"
 echo "
         error_page 404 /404_index.html;
         location = /404_index.html {
@@ -29,17 +16,6 @@ echo "
 #                autoindex on;
 #        }
 " > /tmp/error_nginx
-mkdir -p /home/all
-echo "<h1>All pages HOME</h1><p>" > /home/all/index.html
-for i in ${DOMAIN}
-do
-    SSL="-d ${i} ${SSL}"
-    echo "<p><a href=\"http://$i\">$i</a></p>" >> /home/all/index.html
-    if [ -z "${NODE_REQUEST_DRIVE}" ];then
-        export NODE_REQUEST_DRIVE="$i"
-    fi
-done
-echo "</p>" >> /home/all/index.html
 DOMAIN_FOLDER=`find /home/ssl -name 'fullchain.cer'|sed 's|/fullchain.cer||g'|sed 's|/home/ssl/||g'`
 echo $DOMAIN_FOLDER
 
@@ -76,6 +52,13 @@ else
         DOMAIN="_"
         DOMAIN_IP=true
     else
+        for i in ${DOMAIN}
+        do
+            SSL="-d ${i} ${SSL}"
+            if [ -z "${NODE_REQUEST_DRIVE}" ];then
+                export NODE_REQUEST_DRIVE="$i"
+            fi
+        done
         if ! [ -d /home/ssl ];then
             mkdir /home/ssl
             chmod 7777 -R /home/ssl
@@ -88,7 +71,7 @@ fi
 if [ $DOMAIN_IP == "true" ];then
 echo "server {
         listen 80;
-        root /home/all;
+        root /home/http;
         index index.html index.htm;
         server_name _;
 $(cat /tmp/error_nginx)
@@ -103,19 +86,50 @@ $(cat /tmp/error_nginx)
 }
 " > /tmp/http_nginx
 fi
-cat /tmp/http_nginx /tmp/ssl_nginx | tee /etc/nginx/sites-available/default
+cat /tmp/http_nginx /tmp/ssl_nginx > /etc/nginx/sites-available/default
+service cron start
 service ssh start
 service smbd start
 service nginx start
+
+if [ "${BACKUP_ENABLE}" == "true" ];then
+    if ! [ -e "/home/config/google_drive_token.json" ];then
+        echo "Please access this link to log into your Google Drive account: http://${NODE_REQUEST_DRIVE}:6899/request"
+        node -p 'require("/node_script/express")'
+    fi
+    if [ -e "/home/config/crontab" ];then
+        contrab "/home/config/crontab"
+    else
+        echo '0 24 * * * root /shell/Backup.sh > /log/Backup.log 2>&1' > "/home/config/crontab"
+    fi
+else
+    echo '* Recommended to create backups *'
+fi
+{
+    username="${ADMIN_USERNAME}"
+    password="${ADMIN_PASSWORD}"
+    pass=$(perl -e 'print crypt($ARGV[0], "password")' $password);
+    useradd -m -p "$pass" "$username";
+    addgroup ${username} sudo;
+    usermod --shell /bin/bash ${username}
+    echo -ne "${ADMIN_PASSWORD}\n${ADMIN_PASSWORD}\n" | smbpasswd -a "${ADMIN_USERNAME}"
+} &> /log/Username.log
+echo "# Admin User" >> /etc/sudoers
+echo "${ADMIN_USERNAME}   ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+echo "
+**********************************
+*   Username:  ${ADMIN_USERNAME}
+*   Passworld: ${ADMIN_PASSWORD}
+**********************************"
+chmod 7777 -R /home/ssl /home/http /log /home/config
 while true
 do
     service --status-all &> /log/service
     if cat /log/service | grep "nginx" | grep -q ' + '; then
-            sleep 10s
+        sleep 10s
     else
-            echo "The nginx service is not running leaving"
-            exit 1
+        echo "The nginx service is not running leaving"
+        exit 9
     fi
 done
-node 
 exit 0
