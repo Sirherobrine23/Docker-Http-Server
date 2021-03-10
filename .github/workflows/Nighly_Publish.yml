@@ -1,11 +1,14 @@
 name: Http Server
 on:
   push:
+    branches:
+      - main
   schedule:
     - cron: 0 0 * * */1
 jobs:
   base:
     runs-on: ubuntu-latest
+    if: github.actor == 'Sirherobrine23'
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -28,8 +31,7 @@ jobs:
         with:
           push: true
           tags: |
-            sirherobrine23/http_server:latest
-            sirherobrine23/http_server:${{ github.run_id }}
+            sirherobrine23/http_server:nighty
           platforms: linux/amd64,linux/arm64
 
       - name: Image digest
