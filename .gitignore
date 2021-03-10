@@ -1,2 +1,5 @@
 *.env
 !example.env
+.backup/
+.docker_teste/
+.backup/

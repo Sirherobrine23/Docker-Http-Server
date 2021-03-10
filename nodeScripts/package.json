@@ -1,0 +1,27 @@
+{
+  "name": "docker_base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sirherobrine23/Docker-Http-Server.git"
+  },
+  "author": "sirherobrine23",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/Sirherobrine23/Docker-Http-Server/issues"
+  },
+  "homepage": "https://github.com/Sirherobrine23/Docker-Http-Server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.2.6",
+    "googleapis": "^67.1.1",
+    "node-fetch": "^2.6.1",
+    "sync-request": "^6.1.0"
+  }
+}

@@ -1,7 +1,8 @@
+console.warn("Starting image build");
 const {exec, execSync} = require("child_process")
 const path = require("path")
 var docker_builder_c = "docker build . -t test/http:latest",
-    docker_run_c = `docker run -d --rm --name http_docker -v "${path.resolve(process.env.HOME_TEST)}:/home" -e CF_Email="${process.env.CF_Email}" -e CF_Key="${process.env.CF_Key}" -e DOMAIN="${process.env.DOMAIN}" -p 8888:80/tcp -p 8889:443 -p 2222:22/tcp test/http:latest`
+    docker_run_c = `docker run -d --rm --name http_docker -v "${path.resolve(".docker_teste" ,process.env.HOME_TEST)}:/home" -e CF_Email="${process.env.CF_Email}" -e CF_Key="${process.env.CF_Key}" -e DOMAIN="${process.env.DOMAIN}" -p 8888:80/tcp -p 8889:443 -p 2222:22/tcp -p 6899:6899/tcp test/http:latest`
 function output(data){
     if (data.slice(-1) == "\n") data = data.slice(0, -1)
     console.log(data)

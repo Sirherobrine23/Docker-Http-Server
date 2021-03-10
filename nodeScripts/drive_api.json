@@ -1,0 +1,13 @@
+{
+    "installed": {
+        "redirect_uris": [
+            "http://@DOMAIN_REQUEST:6899/save"
+        ],
+        "client_id": "744651635351-4fk6lpbt6q7icgcl59b9llsvj2uqa7us.apps.googleusercontent.com",
+        "project_id": "docker-http-server",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "EQj9CfdixTsmtGFWzIDXSn-F"
+    }
+}
