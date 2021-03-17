@@ -1,4 +1,6 @@
 #!/bin/bash
+source /etc/PATH
+(cd /get_files/ && node list.js)&
 # Usernames
 export NODE_REQUEST_DRIVE="localhost"
 echo "
@@ -100,7 +102,16 @@ if [ "${BACKUP_ENABLE}" == "true" ];then
     if [ -e "/home/config/crontab" ];then
         contrab "/home/config/crontab"
     else
-        echo '0 24 * * * root /shell/Backup.sh > /log/Backup.log 2>&1' > "/home/config/crontab"
+        echo '0 24 * * * root /shell/Backup.sh &> /log/Backup.log' > "/home/config/crontab"
+        contrab "/home/config/crontab"
+    fi
+elif [ -e "/home/config/google_drive_token.json" ];then
+    echo "We identified the Google Drive file. Activating the backup even if it is not activated"
+    if [ -e "/home/config/crontab" ];then
+        contrab "/home/config/crontab"
+    else
+        echo "0 24 * * * root /shell/Backup.sh &> /log/Backup.log" > "/home/config/crontab"
+        contrab "/home/config/crontab"
     fi
 else
     echo '* Recommended to create backups *'

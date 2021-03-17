@@ -26,6 +26,18 @@
                 "description": "Example: example.com files.example.com f.example.com"
             }
         },
+        "EnableBackup": {
+            "type": "bool",
+            "metadata": {
+                "description": "Activate the backup of the files in Google Drive, if activated you will have to go in the log container to get the google authentication link"
+            }
+        },
+        "CronBackup": {
+            "type": "string",
+            "allowedValues": [
+                "24 hours"
+            ]
+        },
         "AdminUser": {
             "type": "string",
             "minLength": 6,
@@ -51,7 +63,7 @@
     "variables": {
         "files": "files",
         "ssl": "ssl",
-        "Config": "Configs",
+        "Config": "configs",
         "StorageName": "[concat('files', uniqueString(resourceGroup().id))]",
         "DnsName": "[concat('files-', uniqueString(resourceGroup().id))]",
         "bds_ports": [
@@ -73,6 +85,10 @@
             },
             {
                 "port": "22",
+                "protocol": "TCP"
+            },
+            {
+                "port": "2544",
                 "protocol": "TCP"
             }
         ]
@@ -113,7 +129,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
             ],
             "properties": {
-                "shareQuota": "4"
+                "shareQuota": "[int('4')]"
             }
         },
         {
@@ -124,7 +140,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
             ],
             "properties": {
-                "shareQuota": "1"
+                "shareQuota": "[int('1')]"
             }
         },
         {
@@ -169,7 +185,11 @@
                                 },
                                 {
                                     "name": "ADMIN_PASSWORD",
-                                    "value": "[parameters('AdminPass')]"
+                                    "secureValue": "[parameters('AdminPass')]"
+                                },
+                                {
+                                    "name": "BACKUP_ENABLE",
+                                    "value": "[parameters('EnableBackup')]"
                                 }
                             ],
                             "volumeMounts": [
