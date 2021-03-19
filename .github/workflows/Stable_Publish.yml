@@ -1,8 +1,10 @@
 name: Stable Image
 on:
   push:
-    branches:
-      - stable
+    tags:
+      - Stable**
+      - V**
+      - v**
   schedule:
     - cron: 0 0 * * */1
 jobs:
