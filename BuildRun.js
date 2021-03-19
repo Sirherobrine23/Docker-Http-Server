@@ -10,7 +10,7 @@ const ports_options = "-p 8888:80/tcp -p 8889:443 -p 2222:22/tcp -p 6899:6899/tc
         docker: "test/http:latest"
     };
 var docker_builder_c = `konsole -e docker build . -t ${docker_name.docker}`,
-    docker_run_c = `konsole -e docker run -ti --rm --name ${docker_name.name} ${ports_options} ${mounts} ${variasbles} ${docker_name.docker}`
+    docker_run_c = `konsole --noclose -e docker run -ti --rm --name ${docker_name.name} ${ports_options} ${mounts} ${variasbles} ${docker_name.docker}`
 
 execSync(`konsole -e docker stop  $(docker ps -a |grep -v 'CONTAINER'|awk '{print $1}')`)
 const build_code = 

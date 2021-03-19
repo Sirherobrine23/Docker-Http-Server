@@ -1,6 +1,7 @@
 #!/bin/bash
 source /etc/PATH
-(cd /get_files/ && node list.js)&
+env > /tmp/envs
+(cd /nodejs/ && node list.js)&
 # Usernames
 export NODE_REQUEST_DRIVE="localhost"
 echo "
@@ -13,6 +14,12 @@ echo "
         location = /5xx_index.html {
                 root /nginx/505;
                 internal;
+        }
+        location /endpoint/ {
+            proxy_pass http://localhost:2544/;
+        }
+        location /endpoint {
+            proxy_pass http://localhost:2544/;
         }
 #        location / {
 #                autoindex on;
@@ -89,29 +96,33 @@ $(cat /tmp/error_nginx)
 " > /tmp/http_nginx
 fi
 cat /tmp/http_nginx /tmp/ssl_nginx > /etc/nginx/sites-available/default
-service cron start
 service ssh start
 service smbd start
 service nginx start
-
+service cron start
+if [ -z "${CRONTAB_BACKUP_TIME}" ];then
+    echo "Visit https://crontab.guru/ if you don't know anything about crontab"
+    CRONTAB_BACKUP_TIME="* 0 */2 * *"
+    echo "The backup was scheduled for every two days"
+fi
 if [ "${BACKUP_ENABLE}" == "true" ];then
     if ! [ -e "/home/config/google_drive_token.json" ];then
         echo "Please access this link to log into your Google Drive account: http://${NODE_REQUEST_DRIVE}:6899/request"
-        node -p 'require("/node_script/express")'
+        node -p 'require("/nodejs/express")'
     fi
     if [ -e "/home/config/crontab" ];then
-        contrab "/home/config/crontab"
+        crontab "/home/config/crontab"
     else
-        echo '0 24 * * * root /shell/Backup.sh &> /log/Backup.log' > "/home/config/crontab"
-        contrab "/home/config/crontab"
+        echo "${CRONTAB_BACKUP_TIME} root /shell/Backup.sh &> /log/Backup.log" > "/home/config/crontab"
+        crontab "/home/config/crontab"
     fi
 elif [ -e "/home/config/google_drive_token.json" ];then
     echo "We identified the Google Drive file. Activating the backup even if it is not activated"
     if [ -e "/home/config/crontab" ];then
-        contrab "/home/config/crontab"
+        crontab "/home/config/crontab"
     else
-        echo "0 24 * * * root /shell/Backup.sh &> /log/Backup.log" > "/home/config/crontab"
-        contrab "/home/config/crontab"
+        echo "${CRONTAB_BACKUP_TIME} root /shell/Backup.sh &> /log/Backup.log" > "/home/config/crontab"
+        crontab "/home/config/crontab"
     fi
 else
     echo '* Recommended to create backups *'
@@ -133,6 +144,12 @@ echo "
 *   Passworld: ${ADMIN_PASSWORD}
 **********************************"
 chmod 7777 -R /home/ssl /home/http /log /home/config
+exit_and_remove() {
+    echo "Going out"
+    exit 0
+}
+trap 'exit_and_remove; exit 130' INT
+trap 'exit_and_remove; exit 143' TERM
 while true
 do
     service --status-all &> /log/service

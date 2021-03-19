@@ -32,10 +32,23 @@
                 "description": "Activate the backup of the files in Google Drive, if activated you will have to go in the log container to get the google authentication link"
             }
         },
-        "CronBackup": {
+        "EnableCrontab": {
             "type": "string",
             "allowedValues": [
-                "24 hours"
+                "true",
+                "false"
+            ]
+        },
+        "CrontabBackupTime": {
+            "type": "string",
+            "defaultValue": "* 0 */2 * *",
+            "allowedValues": [
+                "* 0 */2 * *",
+                "* 0 * * *",
+                "* 0 */6 * *",
+                "* 0 * * */2",
+                "* 0 * * */3",
+                "* 23 * * *"
             ]
         },
         "AdminUser": {
@@ -189,7 +202,11 @@
                                 },
                                 {
                                     "name": "BACKUP_ENABLE",
-                                    "value": "[parameters('EnableBackup')]"
+                                    "value": "[parameters('EnableCrontab')]"
+                                },
+                                {
+                                    "name": "CRONTAB_BACKUP_TIME",
+                                    "value": "[parameters('CrontabBackupTime')]"
                                 }
                             ],
                             "volumeMounts": [

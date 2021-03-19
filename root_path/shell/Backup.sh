@@ -1,5 +1,6 @@
 #!/bin/bash
-#
-cd "/home/http/"
-NODE_REQUEST_DRIVE="localhost" node -p 'require("/node_script/Google_Drive")'
+set -e
+cd "/nodejs"
+source /tmp/envs
+node -p 'require("./Google_Drive")'
 exit 0
