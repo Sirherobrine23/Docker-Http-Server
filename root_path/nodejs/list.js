@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
         var opt;
         if (option === "d") opt="-type d" ;else if (option === "f") opt="-type f"; else opt="";
         if (existsSync(resolve(base_path, required_path))){
-            var json_http = execSync(`find ${base_path}/${required_path} -maxdepth 1 ${opt}`).toString()
+            var json_http = execSync(`find "${base_path}/${required_path}" -maxdepth 1 ${opt}`).toString()
             json_http = json_http.replaceAll(base_path, "").replaceAll(required_path, "").replaceAll("//", "")
             const splithed = json_http.split("\n")
             const filt = []

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Sirherobrine23/Docker-Http-Server#readme",
   "dependencies": {
+    "adm-zip": "^0.5.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",

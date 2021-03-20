@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const fs = require("fs");
+const {readFileSync} = require("fs")
 var cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const bodyParser = require("body-parser");
@@ -17,7 +18,7 @@ app.use(limiter);
 app.use(cors());
 // Urls
 app.get("/request", (req, res) => {
-    const backup_json = JSON.parse(fs.readFileSync("/node_script/drive_api.json").toString().split("@DOMAIN_REQUEST").join(process.env.NODE_REQUEST_DRIVE))
+    const backup_json = JSON.parse(readFileSync("/nodejs/drive_api.json").toString().split("@DOMAIN_REQUEST").join(readFileSync("/tmp/node_url")))
     const user_save_json = "/home/config/google_drive_token.json"
     const secret = backup_json.installed.client_secret;
     const client = backup_json.installed.client_id;
@@ -35,8 +36,8 @@ app.get("/request", (req, res) => {
             //callback(oAuth2Client);
             close_server()
         })
-        var pages_template = (fs.readFileSync("/node_script/index.html", "utf8")).toString()
-        pages_template = pages_template.split("@TOKEN").join(code).split("@NODE_DOMAIN").join(process.env.NODE_REQUEST_DRIVE)
+        var pages_template = (fs.readFileSync("/nodejs/index.html", "utf8")).toString()
+        pages_template = pages_template.split("@TOKEN").join(code).split("@NODE_DOMAIN").join(readFileSync("/tmp/node_url", "utf8"))
         res.send(pages_template)
     })
     
