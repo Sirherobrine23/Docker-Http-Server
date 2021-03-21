@@ -18,3 +18,5 @@ PrintMotd yes
 #Banner none
 AcceptEnv LANG LC_*
 Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+TrustedUserCAKeys /home/config/ssh_/ca.pub

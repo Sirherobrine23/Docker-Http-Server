@@ -26,18 +26,15 @@
                 "description": "Example: example.com files.example.com f.example.com"
             }
         },
-        "EnableBackup": {
-            "type": "bool",
-            "metadata": {
-                "description": "Activate the backup of the files in Google Drive, if activated you will have to go in the log container to get the google authentication link"
-            }
-        },
         "EnableCrontab": {
             "type": "string",
             "allowedValues": [
                 "true",
                 "false"
-            ]
+            ],
+            "metadata": {
+                "description": "Activate the backup of the files in Google Drive, if activated you will have to go in the log container to get the google authentication link"
+            }
         },
         "CrontabBackupTime": {
             "type": "string",
@@ -48,7 +45,9 @@
                 "* 0 */6 * *",
                 "* 0 * * */2",
                 "* 0 * * */3",
-                "* 23 * * *"
+                "* 23 * * *",
+                "0 0 27 * * ",
+                "0 0 * * */3"
             ]
         },
         "AdminUser": {
@@ -75,7 +74,6 @@
     },
     "variables": {
         "files": "files",
-        "ssl": "ssl",
         "Config": "configs",
         "StorageName": "[concat('files', uniqueString(resourceGroup().id))]",
         "DnsName": "[concat('files-', uniqueString(resourceGroup().id))]",
@@ -142,18 +140,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
             ],
             "properties": {
-                "shareQuota": "[int('4')]"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(variables('StorageName'), '/default/', variables('ssl'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
-            ],
-            "properties": {
-                "shareQuota": "[int('1')]"
+                "shareQuota": "[int('6')]"
             }
         },
         {
@@ -161,8 +148,7 @@
             "name": "[parameters('containerName')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('files') )]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('Config') )]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('ssl') )]"
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('StorageName'),  'default',  variables('Config') )]"
             ],
             "type": "Microsoft.ContainerInstance/containerGroups",
             "apiVersion": "2019-12-01",
@@ -217,10 +203,6 @@
                                 {
                                 "name": "con",
                                 "mountPath": "/home/config"
-                                },
-                                {
-                                "name": "ssl",
-                                "mountPath": "/home/ssl/"
                                 }
                             ]
                         }
@@ -238,15 +220,6 @@
                         "name": "files",
                         "azureFile": {
                             "shareName": "[variables('files')]",
-                            "StorageAccountName": "[variables('StorageName')]",
-                            // https://stackoverflow.com/a/33227123
-                            "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"
-                        }
-                    },
-                    {
-                        "name": "ssl",
-                        "azureFile": {
-                            "shareName": "[variables('ssl')]",
                             "StorageAccountName": "[variables('StorageName')]",
                             // https://stackoverflow.com/a/33227123
                             "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"

@@ -10,6 +10,18 @@ const base_path = "/home/http"
 app.use(cors());
 app.use(bodyParser.json()); /* https://github.com/github/fetch/issues/323#issuecomment-331477498 */
 app.use(bodyParser.urlencoded({ extended: true }));
+app.get("/Wheatley", (req, res) =>{
+    const checkDiskSpace = require('check-disk-space')
+    const dir = "/home/http"
+    var Html_response = readFileSync(resolve(__dirname, "space.html"), "utf8")
+    checkDiskSpace(dir).then((diskSpace) => {
+        var space = Math.trunc(diskSpace.free / 1014 / 1024 /1024)
+        if (space > 1000) space = (Math.trunc(space / 1024)+"Tb")
+        else space = (space+"gb")
+        Html_response = Html_response.split("@SPACE").join(space)
+        res.send(Html_response)
+    })
+})
 app.get("/", (req, res) => {
     var required_path = req.query.path||"undefined"
     if (required_path.charAt(0) === "/") required_path = required_path.replace("/", "")

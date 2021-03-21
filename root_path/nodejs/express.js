@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const fs = require("fs");
-const {readFileSync} = require("fs")
+const { resolve } = require("path")
+const {readFileSync, writeFileSync,} = require("fs")
 var cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const bodyParser = require("body-parser");
@@ -18,7 +18,8 @@ app.use(limiter);
 app.use(cors());
 // Urls
 app.get("/request", (req, res) => {
-    const backup_json = JSON.parse(readFileSync("/nodejs/drive_api.json").toString().split("@DOMAIN_REQUEST").join(readFileSync("/tmp/node_url")))
+    const JsonFile = readFileSync(resolve(__dirname, "drive_api.json")).toString().split("@DOMAIN_REQUEST").join(readFileSync("/tmp/node_url", "utf8").replace("file.examples.com", "localhost").split("\n").join(""))
+    const backup_json = JSON.parse(JsonFile)
     const user_save_json = "/home/config/google_drive_token.json"
     const secret = backup_json.installed.client_secret;
     const client = backup_json.installed.client_id;
@@ -32,11 +33,11 @@ app.get("/request", (req, res) => {
         oAuth2Client.getToken(code, (err, token) => {
             if (err) return console.error("Error retrieving access token", err);
             oAuth2Client.setCredentials(token);
-            fs.writeFileSync(user_save_json, JSON.stringify(token, null, 2));
+            writeFileSync(user_save_json, JSON.stringify(token, null, 2));
             //callback(oAuth2Client);
             close_server()
         })
-        var pages_template = (fs.readFileSync("/nodejs/index.html", "utf8")).toString()
+        var pages_template = (readFileSync("/nodejs/index.html", "utf8")).toString()
         pages_template = pages_template.split("@TOKEN").join(code).split("@NODE_DOMAIN").join(readFileSync("/tmp/node_url", "utf8"))
         res.send(pages_template)
     })

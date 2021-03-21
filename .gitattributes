@@ -1,3 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.sh eol=LF
+root_path/etc/ssh/sshd_config eol=LF
+root_path/nginx/config.conf eol=LF
