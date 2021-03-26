@@ -3,13 +3,18 @@ const app = express();
 var cors = require("cors");
 const bodyParser = require("body-parser");
 const {execSync} = require("child_process");
-const { readFileSync, existsSync, lstatSync } = require("fs");
+const { readFileSync, existsSync, lstatSync, writeFileSync } = require("fs");
 const { resolve, join } = require("path");
+const fileUpload = require('express-fileupload');
 const base_path = "/home/http"
+const base_config = "/home/config"
+
 
 app.use(cors());
 app.use(bodyParser.json()); /* https://github.com/github/fetch/issues/323#issuecomment-331477498 */
 app.use(bodyParser.urlencoded({ extended: true }));
+// default options
+app.use(fileUpload());
 app.get("/Wheatley", (req, res) =>{
     const checkDiskSpace = require('check-disk-space')
     const dir = "/home/http"
@@ -22,6 +27,24 @@ app.get("/Wheatley", (req, res) =>{
         res.send(Html_response)
     })
 })
+
+app.post('/upload', function(req, res) {
+    var fileUploaded;
+    var uploadPath;
+    if (!req.files || Object.keys(req.files).length === 0) {return res.status(400).send('No files were uploaded.');}
+    const files = Object.getOwnPropertyNames(req.files)
+    for (let save in files){
+        fileUploaded = req.files[files[save]];
+        console.log(fileUploaded);
+        uploadPath = resolve(base_path, fileUploaded.name);
+        // Use the mv() method to place the file somewhere on your server
+        fileUploaded.mv(uploadPath, function(err) {
+            if (err) return res.status(500).send(err);
+        });
+    }
+    res.send('File uploaded!');
+});
+
 app.get("/", (req, res) => {
     var required_path = req.query.path||"undefined"
     if (required_path.charAt(0) === "/") required_path = required_path.replace("/", "")
