@@ -28,9 +28,9 @@
         },
         "ImageChannel": {
             "type": "string",
-            "defaultValue": "nightly",
+            "defaultValue": "nighty",
             "allowedValues": [
-                "nightly",
+                "nighty",
                 "latest",
                 "stable"
             ]

@@ -74,8 +74,7 @@ do
     fi
 done
 
-if  [ -e "/home/config/ssl/${DOMAIN_FOLDER}/fullchain.cer" ]
-then
+if  [ -e "/home/config/ssl/${DOMAIN_FOLDER}/fullchain.cer" ];then
     echo "We already have an SSL certificate: /home/config/ssl/${DOMAIN_FOLDER}/fullchain.cer"
     DOMAIN_IP=false
 echo "server {

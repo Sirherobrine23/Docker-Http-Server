@@ -7,9 +7,7 @@ echo "Resumo:
 for i in ${DOMAIN}
 do
     SSL="-d ${i} ${SSL}"
-    if [ -z "${NODE_REQUEST_DRIVE}" ];then
-        ROOT_DOMAIN="$i"
-    fi
+    if [ -z "${NODE_REQUEST_DRIVE}" ];then ROOT_DOMAIN="$i";fi
 done
 echo
 if [ "${CF_Email}" == "example@hotmail.com" ];then
@@ -35,6 +33,7 @@ else
     fi
     acme.sh --config-home /home/config/ssl --dns dns_cf --issue ${SSL}
     chmod 7777 -R /home/config/ssl
+if  [ -e "/home/config/ssl/${DOMAIN_FOLDER}/fullchain.cer" ];then
 echo "server {
         listen [::]:443 ssl ipv6only=on;
         listen 443 ssl;
@@ -46,5 +45,6 @@ echo "server {
 $(cat /nginx/config.conf)
 }
 " > /tmp/ssl_nginx
+fi
     # exit 24
 fi
