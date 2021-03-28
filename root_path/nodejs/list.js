@@ -22,7 +22,7 @@ app.get("/Wheatley", (req, res) =>{
     checkDiskSpace(dir).then((diskSpace) => {
         var space = Math.trunc(diskSpace.free / 1014 / 1024 /1024)
         if (space > 1000) space = (Math.trunc(space / 1024)+"Tb")
-        else space = (space+"gb")
+        else space = (space+"Gb")
         Html_response = Html_response.split("@SPACE").join(space)
         res.send(Html_response)
     })

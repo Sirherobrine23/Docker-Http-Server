@@ -169,8 +169,8 @@ do
     if cat /log/service | grep "nginx" | grep -q ' + '; then
         sleep 10s
     else
-        echo "The nginx service is not running leaving"
+        journalctl -u neginx
         exit 9
     fi
 done
-exit 0
+exit

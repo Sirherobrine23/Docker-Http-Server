@@ -26,8 +26,18 @@
                 "description": "Example: example.com files.example.com f.example.com"
             }
         },
+        "ImageChannel": {
+            "type": "string",
+            "defaultValue": "nightly",
+            "allowedValues": [
+                "nightly",
+                "latest",
+                "stable"
+            ]
+        },
         "EnableCrontab": {
             "type": "string",
+            "defaultValue": "true",
             "allowedValues": [
                 "true",
                 "false"
@@ -77,6 +87,9 @@
         "Config": "configs",
         "StorageName": "[concat('files', uniqueString(resourceGroup().id))]",
         "DnsName": "[concat('files-', uniqueString(resourceGroup().id))]",
+        "dockerImage": "[concat('sirherobrine23/http_server:', parameters('ImageChannel'))]",
+        "ShareNameConfig": "[concat(variables('Config'), '-volume')]",
+        "ShareNameFiles": "[concat(variables('files'), '-volume')]",
         "bds_ports": [
             {
                 "port": "80",
@@ -140,7 +153,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('StorageName'))]"
             ],
             "properties": {
-                "shareQuota": "[int('6')]"
+                "shareQuota": "[int('8')]"
             }
         },
         {
@@ -157,7 +170,7 @@
                     {
                         "name": "http-server",
                         "properties": {
-                            "image": "sirherobrine23/http_server:latest",
+                            "image": "[variables('dockerImage')]",
                             "resources": {
                                 "requests": {
                                     "cpu": "[int(parameters('numberCpuCores'))]",
@@ -197,11 +210,11 @@
                             ],
                             "volumeMounts": [
                                 {
-                                "name": "files",
+                                "name": "[variables('ShareNameFiles')]",
                                 "mountPath": "/home/http/"
                                 },
                                 {
-                                "name": "con",
+                                "name": "[variables('ShareNameConfig')]",
                                 "mountPath": "/home/config"
                                 }
                             ]
@@ -217,7 +230,7 @@
                 },
                 "volumes": [
                     {
-                        "name": "files",
+                        "name": "[variables('ShareNameFiles')]",
                         "azureFile": {
                             "shareName": "[variables('files')]",
                             "StorageAccountName": "[variables('StorageName')]",
@@ -226,11 +239,10 @@
                         }
                     },
                     { 
-                        "name": "con",
+                        "name": "[variables('ShareNameConfig')]",
                         "azureFile": {
                             "shareName": "[variables('Config')]",
                             "StorageAccountName": "[variables('StorageName')]",
-                            // https://stackoverflow.com/a/33227123
                             "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"
                         }
                     }

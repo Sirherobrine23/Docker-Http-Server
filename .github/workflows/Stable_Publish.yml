@@ -32,6 +32,7 @@ jobs:
           push: true
           tags: |
             sirherobrine23/http_server:latest
+            sirherobrine23/http_server:stable
             sirherobrine23/http_server:${{ github.run_id }}
           platforms: linux/amd64,linux/arm64
 
