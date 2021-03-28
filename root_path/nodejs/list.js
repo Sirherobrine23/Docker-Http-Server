@@ -6,8 +6,8 @@ const {execSync} = require("child_process");
 const { readFileSync, existsSync, lstatSync, writeFileSync } = require("fs");
 const { resolve, join } = require("path");
 const fileUpload = require('express-fileupload');
-const base_path = "/home/http"
-const base_config = "/home/config"
+const base_path = "/home/http",
+    base_config = "/home/config"
 
 
 app.use(cors());
@@ -28,22 +28,22 @@ app.get("/Wheatley", (req, res) =>{
     })
 })
 
-app.post('/upload', function(req, res) {
-    var fileUploaded;
-    var uploadPath;
-    if (!req.files || Object.keys(req.files).length === 0) {return res.status(400).send('No files were uploaded.');}
-    const files = Object.getOwnPropertyNames(req.files)
-    for (let save in files){
-        fileUploaded = req.files[files[save]];
-        console.log(fileUploaded);
-        uploadPath = resolve(base_path, fileUploaded.name);
-        // Use the mv() method to place the file somewhere on your server
-        fileUploaded.mv(uploadPath, function(err) {
-            if (err) return res.status(500).send(err);
-        });
-    }
-    res.send('File uploaded!');
-});
+// app.post('/upload', function(req, res) {
+//     var fileUploaded;
+//     var uploadPath;
+//     if (!req.files || Object.keys(req.files).length === 0) {return res.status(400).send('No files were uploaded.');}
+//     const files = Object.getOwnPropertyNames(req.files)
+//     for (let save in files){
+//         fileUploaded = req.files[files[save]];
+//         console.log(fileUploaded);
+//         uploadPath = resolve(base_path, fileUploaded.name);
+//         // Use the mv() method to place the file somewhere on your server
+//         fileUploaded.mv(uploadPath, function(err) {
+//             if (err) return res.status(500).send(err);
+//         });
+//     }
+//     res.send('File uploaded!');
+// });
 
 app.get("/", (req, res) => {
     var required_path = req.query.path||"undefined"

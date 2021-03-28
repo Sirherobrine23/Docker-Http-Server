@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:rolling
 ENV DEBIAN_FRONTEND=noninteractive
 EXPOSE 80/tcp 443/tcp 445/tcp 22/tcp
 RUN \
